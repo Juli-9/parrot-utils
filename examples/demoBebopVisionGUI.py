@@ -12,6 +12,7 @@ import cv2
 import time
 from PyQt5.QtGui import QImage
 
+
 isAlive = False
 
 class UserVision:

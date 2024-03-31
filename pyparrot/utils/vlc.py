@@ -47,7 +47,7 @@ import sys
 import functools
 
 # Used by EventManager in override.py
-from inspect import getargspec
+from inspect import signature
 
 import logging
 logger = logging.getLogger(__name__)
@@ -130,50 +130,17 @@ def find_lib():
             dll = ctypes.CDLL(p)
         except OSError:  # may fail
             dll = ctypes.CDLL('libvlc.so.5')
+
     elif sys.platform.startswith('win'):
-        libname = 'libvlc.dll'
-        p = find_library(libname)
-        if p is None:
-            try:  # some registry settings
-                # leaner than win32api, win32con
-                if PYTHON3:
-                    import winreg as w
-                else:
-                    import _winreg as w
-                for r in w.HKEY_LOCAL_MACHINE, w.HKEY_CURRENT_USER:
-                    try:
-                        r = w.OpenKey(r, 'Software\\VideoLAN\\VLC')
-                        plugin_path, _ = w.QueryValueEx(r, 'InstallDir')
-                        w.CloseKey(r)
-                        break
-                    except w.error:
-                        pass
-            except ImportError:  # no PyWin32
-                pass
-            if plugin_path is None:
-                # try some standard locations.
-                programfiles = os.environ["ProgramFiles"]
-                homedir = os.environ["HOMEDRIVE"]
-                for p in ('{programfiles}\\VideoLan{libname}', '{homedir}:\\VideoLan{libname}',
-                          '{programfiles}{libname}',           '{homedir}:{libname}'):
-                    p = p.format(homedir = homedir,
-                                 programfiles = programfiles,
-                                 libname = '\\VLC\\' + libname)
-                    if os.path.exists(p):
-                        plugin_path = os.path.dirname(p)
-                        break
-            if plugin_path is not None:  # try loading
-                p = os.getcwd()
-                os.chdir(plugin_path)
-                 # if chdir failed, this will raise an exception
-                dll = ctypes.CDLL(libname)
-                 # restore cwd after dll has been loaded
-                os.chdir(p)
-            else:  # may fail
-                dll = ctypes.CDLL(libname)
-        else:
-            plugin_path = os.path.dirname(p)
-            dll = ctypes.CDLL(p)
+        # Specify the full path to libvlc.dll
+        libvlc_path = r'C:\Program Files\VideoLAN\VLC\libvlc.dll'
+        try:
+            # Attempt to load the VLC library using the full path
+            dll = ctypes.CDLL(libvlc_path)
+            plugin_path = os.path.dirname(libvlc_path)
+        except OSError:
+            # Handle the case where the library could not be loaded
+            raise OSError('Could not load libvlc.dll')
 
     elif sys.platform.startswith('darwin'):
         # FIXME: should find a means to configure path
@@ -1649,7 +1616,9 @@ class EventManager(_Ctype):
         if not hasattr(callback, '__call__'):  # callable()
             raise VLCException("%s required: %r" % ('callable', callback))
          # check that the callback expects arguments
-        if not any(getargspec(callback)[:2]):  # list(...)
+        sig = signature(callback)[:2]
+        argspec = {'args': list(sig.parameters.keys()), 'varargs': None, 'keywords': None, 'defaults': None}
+        if not any(argspec):  # list(...)
             raise VLCException("%s required: %r" % ('argument', callback))
 
         if self._callback_handler is None:
