@@ -105,16 +105,23 @@ class DroneVision:
         print(self.utilPath)
 
         if (self.cleanup_old_images):
-            print("removing all the old images")
             if os.path.exists(self.imagePath):
-                print("Removing all old images")
-                shutil.rmtree(self.imagePath)
+            # Attempt to remove tree; if failed show an error using try...except
+                try:
+                    shutil.rmtree(self.imagePath)
+                except PermissionError:
+                    # If a permission error is encountered, print a message and skip the deletion
+                    print(f"Permission denied when trying to remove {self.imagePath}. Directory may be in use.")
+                    # Optionally, attempt to change permission and try again here
+                except Exception as e:
+                    # For other exceptions, print the message and skip
+                    print(f"Error removing {self.imagePath}: {e}")
+                else:
+                    # If the removal was successful, recreate the directory
+                    os.makedirs(self.imagePath)
             else:
-                print("No old images directory to remove")
-            
-            # make the directory if it doesn't exist
-            os.makedirs(self.imagePath, exist_ok=True)
-            print("Created the images directory")
+                # If the directory does not exist, create it
+                os.makedirs(self.imagePath)
 
         # the first step is to open the rtsp stream through ffmpeg first
         # this step creates a directory full of images, one per frame
