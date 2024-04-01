@@ -4,7 +4,7 @@ from pyparrot.Model import Model
 import cv2
 import time
 import os
-import subprocess  # Import subprocess module
+import subprocess
 
 running = True
 
@@ -30,8 +30,20 @@ if success:
             ffplay_process = subprocess.Popen(ffplay_cmd, shell=True)
 
             # Keep the program running until interrupted by the user
+            i = 0
             while running:
+                i += 1
                 time.sleep(0.1)  # Sleep to prevent excessive CPU usage
+                if i % 10 == 0:
+                    sensors = bebop.sensors.sensors_dict
+                    # Print sensor data in a readable format
+                    print("Sensor Data:")
+                    for key, value in sensors.items():
+                        # Customize the labels for specific sensor data if needed
+                        label = key.replace("Changed_", " ").replace("_", " ")
+                        print(f"{label}: {value}")
+                    print("-" * 20)  # Separator for readability
+
 
         except KeyboardInterrupt:
             # User interrupted the program (Ctrl+C)
