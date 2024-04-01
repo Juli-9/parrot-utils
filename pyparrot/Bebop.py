@@ -452,13 +452,19 @@ class Bebop():
         The packets can be picked up by opening an approriate SDP file in a media
         player such as VLC, MPlayer, FFMPEG or OpenCV.
 
-        :return: nothing
+        :return: Boolean
         """
+        try:
+            command_tuple = self.command_parser.get_command_tuple("ardrone3", "MediaStreaming", "VideoEnable")
+            param_tuple = [1] # Enable
+            param_type_tuple = ['u8']
+            self.drone_connection.send_param_command_packet(command_tuple,param_tuple,param_type_tuple)
+            return True
+        
+        except Exception as e:
+            print("Error starting video stream: %s" % e)
+            return False
 
-        command_tuple = self.command_parser.get_command_tuple("ardrone3", "MediaStreaming", "VideoEnable")
-        param_tuple = [1] # Enable
-        param_type_tuple = ['u8']
-        self.drone_connection.send_param_command_packet(command_tuple,param_tuple,param_type_tuple)
 
 
     def stop_video_stream(self):

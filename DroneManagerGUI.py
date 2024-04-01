@@ -8,19 +8,6 @@ import subprocess  # Import subprocess module
 
 running = True
 
-class UserVision:
-    def __init__(self, vision):
-        self.index = 0
-        self.vision = vision
-
-    def save_pictures(self, args):
-        img = self.vision.get_latest_valid_picture()
-
-        if (img is not None):
-            filename = "test_image_%06d.png" % self.index
-            cv2.imwrite(filename, img)
-            self.index += 1
-
 # make my bebop object
 bebop = Bebop()
 
@@ -30,10 +17,7 @@ success = bebop.connect(5)
 if success:
     # start up the video
     bebopVision = DroneVision(bebop, Model.BEBOP)
-    userVision = UserVision(bebopVision)
-    bebopVision.set_user_callback_function(userVision.save_pictures, user_callback_args=None)
     bebopVision.drone_object.start_video_stream()
-
     
     if success:
         print("Vision successfully started!")
@@ -44,7 +28,7 @@ if success:
             # Use subprocess.Popen to run ffplay without blocking
             ffplay_cmd = "ffplay -fflags nobuffer -flags low_delay -protocol_whitelist file,rtp,udp -i pyparrot/utils/bebop.sdp"
             ffplay_process = subprocess.Popen(ffplay_cmd, shell=True)
-            
+
             # Keep the program running until interrupted by the user
             while running:
                 time.sleep(0.1)  # Sleep to prevent excessive CPU usage
