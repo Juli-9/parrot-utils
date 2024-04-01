@@ -4,6 +4,7 @@ from pyparrot.Model import Model
 import cv2
 import time
 import os
+import subprocess  # Import subprocess module
 
 running = True
 
@@ -31,9 +32,8 @@ if success:
     bebopVision = DroneVision(bebop, Model.BEBOP)
     userVision = UserVision(bebopVision)
     bebopVision.set_user_callback_function(userVision.save_pictures, user_callback_args=None)
-    #success = bebopVision.open_video()
-    success = True
-    bebopVision._start_video_buffering()
+    bebopVision.drone_object.start_video_stream()
+
     
     if success:
         print("Vision successfully started!")
@@ -41,7 +41,10 @@ if success:
 
         try:
             # Play the video stream using ffplay (requires ffplay to be installed on your system)
-            os.system("ffplay -fflags nobuffer -flags low_delay -protocol_whitelist file,rtp,udp -i pyparrot/utils/bebop.sdp")
+            # Use subprocess.Popen to run ffplay without blocking
+            ffplay_cmd = "ffplay -fflags nobuffer -flags low_delay -protocol_whitelist file,rtp,udp -i pyparrot/utils/bebop.sdp"
+            ffplay_process = subprocess.Popen(ffplay_cmd, shell=True)
+            
             # Keep the program running until interrupted by the user
             while running:
                 time.sleep(0.1)  # Sleep to prevent excessive CPU usage

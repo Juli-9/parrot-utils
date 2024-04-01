@@ -295,18 +295,27 @@ class DroneVision:
         # the helper threads look for this variable to be true
         self.vision_running = False
 
-        # kill the ffmpeg subprocess
-        print("Killing the ffmpeg subprocess")
-        self.ffmpeg_process.kill()
-        self.ffmpeg_process.terminate()
-        time.sleep(3)
-
-        if (self.ffmpeg_process.poll() is not None):
-            print("Sending a second kill call to the ffmpeg process")
+        # trying to kill the ffmpeg subprocess
+        try:
+            print("Killing the ffmpeg subprocess")
             self.ffmpeg_process.kill()
             self.ffmpeg_process.terminate()
             time.sleep(3)
+        except Exception as e:
+            print("Error killing the ffmpeg process")
+            print(e)
 
+        # trying to kill the vision thread
+        try:
+            if (self.ffmpeg_process.poll() is not None):
+                print("Sending a second kill call to the ffmpeg process")
+                self.ffmpeg_process.kill()
+                self.ffmpeg_process.terminate()
+                time.sleep(3)
+
+        except Exception as e:
+            print("Error killing the ffmpeg process")
+            print(e)
 
         # send the command to kill the vision stream (bebop only)
         if self.model is Model.BEBOP:
