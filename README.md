@@ -1,5 +1,5 @@
 # pyparrot
-Python interface for Parrot Drones
+Python interface for Parrot Drones (mostly Bebop2), forked from the original repository amymcgovern/pyparrot.
 
 pyparrot was designed and implemented by Dr. Amy McGovern to program Parrot Mambo and Parrot Bebop 2
 drones using python.  This interface was developed to teach K-20 STEM concepts
