@@ -7,8 +7,12 @@ drone_manager = DroneManager()
 def connect_callback():
     dpg.set_value("connection_status", "Connecting...")
 
-    drone_manager.connect_wifi("Bebop2-C409844")
-    time.sleep(3)  # Wait for the drone to connect
+    success = drone_manager.connect_wifi("Bebop2-C409844")
+    time.sleep(0.5)
+    if success == False:
+        dpg.configure_item("connection_status", color=[255, 0, 0], default_value="Cannot connect to WiFi.")
+        return
+    time.sleep(1)  # Wait for the drone to connect
 
     connected = drone_manager.connect()
     if connected:
@@ -32,8 +36,9 @@ def stop_callback():
     dpg.configure_item("stream_status", color=[255, 0, 0], default_value="Stream Stopped")
 
 def angle_camera_callback():
-    angle = dpg.get_value("camera_angle")
-    drone_manager.angle_camera(angle)
+    tilt = dpg.get_value("camera_tilt")
+    pan = dpg.get_value("camera_pan")
+    drone_manager.angle_camera(tilt, pan)
 
 dpg.create_context()
 
@@ -44,7 +49,8 @@ with dpg.window(label="Drone Manager", width=600, height=400):
     dpg.add_text("Stream Stopped", tag="stream_status", color=[255, 0, 0])
     dpg.add_button(label="Connect to Drone", callback=connect_callback)
     dpg.add_button(label="Start Video Stream", callback=start_stream_callback)
-    dpg.add_slider_float(label="camera_angle", default_value=0, max_value=20, min_value=-90, tag="camera_angle", callback=angle_camera_callback)
+    dpg.add_slider_float(label="camera_tilt", default_value=0, max_value=20, min_value=-90, tag="camera_tilt", callback=angle_camera_callback)
+    dpg.add_slider_float(label="camera_pan", default_value=0, max_value=35, min_value=-35, tag="camera_pan", callback=angle_camera_callback)
     dpg.add_button(label="Update Sensor Data", callback=update_sensors_callback)
     dpg.add_button(label="Stop and Disconnect", callback=stop_callback)
     dpg.add_text("", tag="sensor_data_text")

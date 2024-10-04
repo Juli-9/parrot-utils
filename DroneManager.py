@@ -40,10 +40,13 @@ class DroneManager:
             result = subprocess.run(cmd, shell=True, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             if result.returncode == 0:
                 print(f"Successfully connected to {ssid}")
+                return True
             else:
                 print(f"Failed to connect to {ssid}: {result.stderr.decode('utf-8')}")
+                return False
         except subprocess.CalledProcessError as e:
             print(f"Error connecting to {ssid}: {e}")
+            return False
 
     def start_video_stream(self):
         """
@@ -95,13 +98,13 @@ class DroneManager:
             # Process or transform the sensor data if necessary
             self.sensor_data[key] = value
 
-    def angle_camera(self, angle):
+    def angle_camera(self, tilt, pan):
         """
         Adjust the camera angle of the drone.
 
         :param angle: The angle to set the camera to.
         """
-        self.bebop.pan_tilt_camera(angle, 0)
+        self.bebop.pan_tilt_camera(tilt, pan)
 
 if __name__ == "__main__":
     manager = DroneManager()

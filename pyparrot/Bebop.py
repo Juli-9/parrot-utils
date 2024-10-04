@@ -264,9 +264,6 @@ class Bebop():
                 new_time = datetime.now()
                 diff = (new_time - start_time).seconds + ((new_time - start_time).microseconds / 1000000.0)
 
-
-
-
     def takeoff(self):
         """
         Sends the takeoff command to the bebop.  Gets the codes for it from the xml files.  Ensures the
@@ -298,7 +295,6 @@ class Bebop():
             if (self.sensors.flying_state == "emergency"):
                 return
             self.smart_sleep(1)
-
 
     def land(self):
         """
@@ -397,7 +393,6 @@ class Bebop():
 
         self.drone_connection.send_pcmd_command(command_tuple, my_roll, my_pitch, my_yaw, my_vertical, duration)
 
-
     def flip(self, direction):
         """
         Sends the flip command to the bebop.  Gets the codes for it from the xml files. Ensures the
@@ -444,7 +439,6 @@ class Bebop():
         while (not self.sensors.RelativeMoveEnded):
             self.smart_sleep(0.01)
 
-
     def start_video_stream(self):
         """
         Sends the start stream command to the bebop. The bebop will start streaming
@@ -465,8 +459,6 @@ class Bebop():
             print("Error starting video stream: %s" % e)
             return False
 
-
-
     def stop_video_stream(self):
         """
         Sends the stop stream command to the bebop. The bebop will stop streaming
@@ -479,7 +471,6 @@ class Bebop():
         param_tuple = [0] # Disable
         param_type_tuple = ['u8']
         self.drone_connection.send_param_command_packet(command_tuple,param_tuple,param_type_tuple)
-
 
     def set_video_stream_mode(self,mode='low_latency'):
         """
