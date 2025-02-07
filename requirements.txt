@@ -1,0 +1,8 @@
+dearpygui>=2.0.0
+defusedxml
+ifaddr
+numpy
+opencv-python
+psutil
+untangle
+zeroconf
