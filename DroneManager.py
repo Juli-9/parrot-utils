@@ -24,7 +24,7 @@ class DroneManager:
             print("Failed to connect to Bebop.")
         return success
 
-    def connect_wifi(self, ssid, password=None):
+    def connect_wifi_windows(self, ssid, password=None):
         """
         Connect to the drone's WiFi network on Windows.
 
@@ -36,6 +36,34 @@ class DroneManager:
                 cmd = f"netsh wlan connect name={ssid} ssid={ssid} key={password}"
             else:
                 cmd = f"netsh wlan connect name={ssid} ssid={ssid}"
+
+            result = subprocess.run(cmd, shell=True, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            if result.returncode == 0:
+                print(f"Successfully connected to {ssid}")
+                return True
+            else:
+                print(f"Failed to connect to {ssid}: {result.stderr.decode('utf-8')}")
+                return False
+        except subprocess.CalledProcessError as e:
+            print(f"Error connecting to {ssid}: {e}")
+            return False
+
+    def connect_wifi_linux(self, ssid, password=None):
+        """
+        Connect to the drone's WiFi network on Windows.
+
+        :param ssid: The SSID of the WiFi network.
+        :param password: The password for the WiFi network, if any.
+        """
+
+        # iw dev | grep Interface | sed -e "s/Interface//" | grep -oE "[a-z0-9]*"
+        # nmcli device wifi connect Bebop2-A394373
+
+        try:
+            if password:
+                cmd = f"nmcli device wifi connect {ssid} {password}"
+            else:
+                cmd = f"nmcli device wifi connect {ssid}"
 
             result = subprocess.run(cmd, shell=True, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             if result.returncode == 0:

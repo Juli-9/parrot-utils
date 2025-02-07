@@ -1,13 +1,22 @@
 import dearpygui.dearpygui as dpg
 from DroneManager import DroneManager  # Adjust this import as necessary
 import time
+import sys
 
 drone_manager = DroneManager()
+
+SSID = "Bebop2-394373"
 
 def connect_callback():
     dpg.set_value("connection_status", "Connecting...")
 
-    success = drone_manager.connect_wifi("Bebop2-C409844")
+    if sys.platform == 'linux':
+        success = drone_manager.connect_wifi_linux(SSID)
+    elif sys.platform.startswith('win'):
+        success = drone_manager.connect_wifi_windows(SSID)
+    else:
+        dpg.set_value("connection_status", "Unknown OS: Can't connect WiFi.")
+
     time.sleep(0.5)
     if success == False:
         dpg.configure_item("connection_status", color=[255, 0, 0], default_value="Cannot connect to WiFi.")
