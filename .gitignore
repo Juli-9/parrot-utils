@@ -105,3 +105,7 @@ venv.bak/
 
 # emacs files
 *~
+
+# IDE
+.idea/
+/.idea/

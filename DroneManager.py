@@ -7,6 +7,7 @@ import psutil
 
 class DroneManager:
     def __init__(self):
+        #self.bebop = Bebop(ip_address="192.168.42.1")
         self.bebop = Bebop()
         self.sensor_data = {}
         self.vision = None
@@ -130,7 +131,9 @@ class DroneManager:
         """
         Adjust the camera angle of the drone.
 
-        :param angle: The angle to set the camera to.
+        :param tilt: The tilt to set the camera to.
+
+        :param pan: The pan to set the camera to.
         """
         self.bebop.pan_tilt_camera(tilt, pan)
 

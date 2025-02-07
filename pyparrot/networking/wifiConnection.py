@@ -19,7 +19,6 @@ class mDNSListener(object):
     """
     This is adapted from the listener code at
 
-    https://pypi.python.org/pypi/zeroconf
     """
     def __init__(self, wifi_connection):
         self.wifi_connection = wifi_connection
@@ -33,6 +32,9 @@ class mDNSListener(object):
         print("Service %s added, service info: %s" % (name, info))
         self.wifi_connection._connect_listener_called(info)
 
+    def update_service(self, zc: Zeroconf, type_: str, name: str) -> None:
+        print(f"Service {name} updated")
+
 
 
 class WifiConnection:
@@ -41,7 +43,9 @@ class WifiConnection:
         """
         Can be a connection to a Anafi, Bebop, Bebop2 or a Mambo right now
 
-        :param type: type of drone to connect to
+        :param drone_type: type of drone to connect to
+
+        :param ip_address: String with the ip of the drone
         """
         self.is_connected = False
         if (drone_type not in ("Anafi", "Bebop", "Bebop2", "Mambo", "Disco")):
@@ -305,10 +309,11 @@ class WifiConnection:
 
         # create the TCP socket for the handshake
         tcp_sock = socket.socket(family=socket.AF_INET, type=socket.SOCK_STREAM)
-        if self.connection_info.addresses:  # Ensuring the addresses list is not empty
-         # Example of accessing the first address in the list
-            first_address = self.connection_info.addresses[0]
-            print(first_address, self.connection_info.port)
+        if hasattr(self, "connection_info"):
+            if self.connection_info.addresses:  # Ensuring the addresses list is not empty
+            # Example of accessing the first address in the list
+                first_address = self.connection_info.addresses[0]
+                print(first_address, self.connection_info.port)
         else:
             print("No address found.")
 
@@ -403,7 +408,7 @@ class WifiConnection:
 
     def _connect_listener_called(self, connection_info):
         """
-        Save the connection info and set the connected to be true.  This si called within the listener
+        Save the connection info and set the connected to be true.  This is called within the listener
         for the connection.
 
         :param connection_info:

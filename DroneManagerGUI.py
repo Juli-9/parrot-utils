@@ -15,6 +15,7 @@ def connect_callback():
     elif sys.platform.startswith('win'):
         success = drone_manager.connect_wifi_windows(SSID)
     else:
+        success = False
         dpg.set_value("connection_status", "Unknown OS: Can't connect WiFi.")
 
     time.sleep(0.5)
@@ -49,9 +50,13 @@ def angle_camera_callback():
     pan = dpg.get_value("camera_pan")
     drone_manager.angle_camera(tilt, pan)
 
-dpg.create_context()
+def exit_callback():
+    dpg.destroy_context()
 
-with dpg.window(label="Drone Manager", width=600, height=400):
+dpg.create_context()
+dpg.set_global_font_scale(2)
+
+with dpg.window(label="Drone Manager", width=1200, height=800):
     dpg.add_text("Drone Status:")
     # Initially set the color of these items to red
     dpg.add_text("Not Connected", tag="connection_status", color=[255, 0, 0])
@@ -62,9 +67,10 @@ with dpg.window(label="Drone Manager", width=600, height=400):
     dpg.add_slider_float(label="camera_pan", default_value=0, max_value=35, min_value=-35, tag="camera_pan", callback=angle_camera_callback)
     dpg.add_button(label="Update Sensor Data", callback=update_sensors_callback)
     dpg.add_button(label="Stop and Disconnect", callback=stop_callback)
-    dpg.add_text("", tag="sensor_data_text")
+    dpg.add_button(label="Exit", callback=exit_callback)
+    dpg.add_text("Sensordata -->", tag="sensor_data_text")
 
-dpg.create_viewport(title='Drone Manager GUI', width=600, height=400)
+dpg.create_viewport(title='Drone Manager GUI', width=1200, height=800)
 dpg.setup_dearpygui()
 dpg.show_viewport()
 dpg.start_dearpygui()
